@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"></head>
+<body>
+<!-- İkinci OCR motoru (ayrı belge = ayrı işçi havuzu): büyük kart/ipucu/telefon okumaları burada,
+     altyazı okumaları ana belgedeki işçilerde; altyazı tabelaların arkasında sıra beklemez -->
+<script src="xct://app/ext/vendor/tesseract.min.js"></script>
+<script src="xct://app/ext/ocr-engine.js"></script>
+<script>
+  // Ana belgeyle yalnızca postMessage ile konuşulur (uygulama adresleri ayrı köken sayılabiliyor)
+  const BASE = 'xct://app/ext/';
+  addEventListener('message', async (e) => {
+    const m = e.data || {};
+    if (m.xct === 'warmup') { xctWarmup(BASE).catch(() => {}); return; }
+    if (m.xct !== 'ocr') return;
+    let cevap;
+    try { cevap = { ok: true, r: await xctRecognize(BASE, m.image) }; } catch (x) { cevap = { ok: false, error: String((x && x.message) || x) }; }
+    e.source.postMessage({ xct: 'ocrSonuc', id: m.id, ...cevap }, '*');
+  });
+  parent.postMessage({ xct: 'ocr2Hazir' }, '*');
+</script>
+</body></html>

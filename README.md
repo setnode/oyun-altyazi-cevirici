@@ -7,6 +7,7 @@
 <p align="center">
   <a href="https://github.com/setnode/oyun-altyazi-cevirici/releases/latest"><img alt="Son sürüm" src="https://img.shields.io/github/v/release/setnode/oyun-altyazi-cevirici?label=s%C3%BCr%C3%BCm&color=2ea44f"></a>
   <img alt="Windows" src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6">
+  <img alt="macOS" src="https://img.shields.io/badge/macOS-13%2B-000000">
   <img alt="Chrome" src="https://img.shields.io/badge/Chrome-eklenti-4285F4">
   <img alt="Lisans" src="https://img.shields.io/badge/lisans-MIT-blue">
 </p>
@@ -14,6 +15,7 @@
 <p align="center">
   <a href="https://github.com/setnode/oyun-altyazi-cevirici/releases/latest"><b>⬇ İndir</b></a> ·
   <a href="#windows-uygulaması">Windows kurulumu</a> ·
+  <a href="#mac-uygulamaları">Mac kurulumu</a> ·
   <a href="#chrome-eklentisi-xbox-cloud-gaming">Chrome kurulumu</a> ·
   <a href="#sık-sorulanlar">Sık sorulanlar</a>
 </p>
@@ -58,6 +60,8 @@ Altyazı ekranda göründüğü sürece hangi platformda oynadığın fark etmez
 |---|---|---|
 | **Windows uygulaması** | Ekrandaki her pencere ve her oyun | PlayStation, PC oyunları, Xbox uygulaması, her şey |
 | **Chrome eklentisi** | xbox.com/play ve YouTube | Xbox Cloud Gaming'i tarayıcıda oynuyorsan (macOS'ta da çalışır) |
+| **setdeniz play (Mac)** | Xbox Cloud Gaming ve Xbox Remote Play, uygulamanın içinde | Mac'te Xbox oynuyorsan: 1440p yayın, çeviri gömülü |
+| **Altyazı Çevirici (Mac)** | Mac'teki her oyun penceresi | PS Remote Play, GeForce NOW ve diğerleri |
 
 ---
 
@@ -115,6 +119,33 @@ Kısayollar oyun tam ekrandayken de çalışır.
 - **Dikey konum:** Çevirinin yüksekliğini ince ayarlar (artı = daha yukarı).
 
 > Discord'da ekran paylaşırken "İngilizcenin üstünde" ve "İngilizcenin altında" modları yayında da görünür.
+
+---
+
+## Mac uygulamaları
+
+İki ayrı uygulama vardır. İkisi de Chrome eklentisinin çeviri motorunun aynısını kullanır (aynı OCR, oyun sözlüğü, hazır GTA 6 havuzu, telefon/ipucu/kart çevirisi ve DeepL desteği).
+
+- **setdeniz play:** Xbox Cloud Gaming'i ve kendi konsoluna Xbox Remote Play'i uygulamanın içinde oynatır. Çeviri içine gömülüdür, ekran kaydı izni gerekmez. Yayın sunucusuna 1440p ekranlı bir bilgisayar olarak bağlanır; pencere başlığında anlık çözünürlük, fps ve ağ gecikmesi görünür. Oyunda bir kez çevrilen cümleler hafızaya alınır, sonraki sefer internete gitmeden gelir.
+- **Altyazı Çevirici:** PS Remote Play, GeForce NOW gibi başka bir uygulamada oynanan oyunun penceresini okur; Türkçe altyazıyı oyunun üstündeki saydam katmanda gösterir.
+
+### Kurulum
+
+1. Releases'ten `setdeniz-play-Mac.zip` ya da `Altyazi-Cevirici-Mac.zip` dosyasını indir ve çıkar.
+2. Uygulamayı **Uygulamalar** klasörüne sürükle.
+3. İlk açılışta "geliştirici doğrulanamadı" uyarısı çıkarsa: **Sistem Ayarları → Gizlilik ve Güvenlik** → **Yine de Aç**. Uygulamalar Apple'a ücretli kayıtlı olmadığı için bu uyarı çıkar.
+4. Yalnızca Altyazı Çevirici için: **Sistem Ayarları → Gizlilik ve Güvenlik → Ekran ve Sistem Sesi Kaydı**'nda uygulamaya izin ver.
+
+**Gerekenler:** macOS 13 (Ventura) veya sonrası; Apple Silicon ve Intel Mac.
+
+### Kullanım
+
+| Kısayol | İşlev |
+|---|---|
+| **⌥T** | Çeviriyi aç / kapat |
+| **⌥R** | Altyazı bölgesini seç |
+
+Kısayollar oyun öndeyken ve tam ekranda da çalışır. setdeniz play'de aynı işler üst çubuktaki düğmelerden, ayarlar sağda açılan panelden yapılır. Ayrıntılar zip'in içindeki `BENIOKU.txt` dosyasında.
 
 ---
 
@@ -184,12 +215,24 @@ dotnet publish -c Release -o cikti
 
 `cikti/XCloudCevirici.exe` tek dosyalık, kurulum gerektirmeyen uygulamadır.
 
+## Kaynaktan derleme (Mac uygulamaları)
+
+Xcode komut satırı araçları gerekir (`xcode-select --install`):
+
+```bash
+cd mac-app
+./build.sh zip
+```
+
+`build/` klasöründe iki uygulama ve zip paketleri oluşur.
+
 ## Klasörler
 
 | Klasör | İçerik |
 |---|---|
 | `xcloud-ceviri/` | Chrome eklentisi. `sozluk.js` ve çeviri havuzu Windows uygulamasıyla ortaktır. |
 | `windows-app/` | Windows uygulamasının kaynak kodu (C#, WinForms, Windows OCR) |
+| `mac-app/` | Mac uygulamalarının kaynak kodu (Swift, WebKit, ScreenCaptureKit); çeviri motoru `xcloud-ceviri/` ile ortaktır |
 | `havuz/` | Hazır çeviri havuzunu üreten betikler ve elle düzeltilmiş çeviriler |
 
 ---

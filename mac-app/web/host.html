@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; }
+  /* Yakalanan oyun görüntüsü: eklenti bunu "oyun videosu" olarak okur, kendisi görünmez */
+  #v { position: fixed; inset: 0; width: 100vw; height: 100vh; object-fit: fill; opacity: 0.001; pointer-events: none; }
+</style>
+</head>
+<body>
+<video id="v" autoplay muted playsinline></video>
+<script src="xct://app/ext/havuz.js"></script>
+<script src="xct://app/mac/host.js"></script>
+<script src="xct://app/ext/sozluk.js"></script>
+<script src="xct://app/ext/content.js"></script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "xCloud Altyazı Çevirici",
-  "version": "1.14.5",
+  "version": "1.15.0",
   "description": "Xbox Cloud Gaming (xbox.com/play) ekranındaki altyazıları okuyup canlı olarak Türkçeye çevirir.",
   "permissions": [
     "offscreen",

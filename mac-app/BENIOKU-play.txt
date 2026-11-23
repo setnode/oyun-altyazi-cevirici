@@ -1,0 +1,61 @@
+SETDENIZ PLAY — MAC
+===================
+
+Xbox Cloud Gaming ve Xbox Remote Play'i (kendi konsolun) uygulamanın içinden oynatır.
+Altyazı çevirisi içine gömülüdür: İngilizce altyazılar canlı olarak Türkçeye çevrilip
+oyunun üstünde gösterilir. Ekran kaydı izni gerekmez; çeviri, görüntüyü doğrudan
+uygulamanın içinden okur.
+
+Gereken: macOS 13 (Ventura) veya üstü. Apple Silicon (M1–M4) ve Intel Mac.
+
+
+KURULUM
+-------
+1. "setdeniz play.app" dosyasını Uygulamalar (Applications) klasörüne sürükle.
+2. İlk açılışta macOS "geliştirici doğrulanamadı" diyebilir (uygulama ücretsiz ve
+   Apple'a ücretli kayıtlı değil). Şöyle aç:
+     Sistem Ayarları › Gizlilik ve Güvenlik › aşağıda "setdeniz play engellendi"
+     yazısının yanındaki "Yine de Aç" düğmesine bas.
+   Ya da Terminal'de bir kez şunu çalıştır:
+     xattr -dr com.apple.quarantine "/Applications/setdeniz play.app"
+3. Uygulama xbox.com/play ile açılır. Microsoft hesabınla bir kez giriş yapman yeter;
+   oturum kalıcıdır.
+
+
+KULLANIM
+--------
+1. Oyunu seç: Cloud Gaming'den bir oyun ya da "Konsollarım" altından kendi Xbox'ın.
+2. Üst çubuktaki altyazı simgesiyle (ya da ⌥T) çeviriyi aç. Açıkken simge yeşildir.
+3. Gerekirse kesik çizgili dikdörtgen simgesiyle (ya da ⌥R) yalnızca İngilizce
+   altyazının çıktığı alanı çiz (Esc: iptal).
+4. Kaydırıcı simgesi çeviri ayarlarını sağ tarafta açar: dil, konum, görünüm,
+   yazı boyu, telefon/ipucu/harita çevirisi ve DeepL anahtarı.
+5. Çapraz oklar simgesi oyunu tam ekrana alır; çeviri tam ekranda da çalışır.
+
+Görüntü kalitesi:
+- Uygulama, yayın sunucusuna 1440p ekranlı bir bilgisayar olarak bağlanır ve en
+  yüksek kaliteli H.264 profilini ister; alıcı tamponu en kısaya çekilir.
+- Çözünürlüğü xbox.com ayarlarından seçersin. Remote Play'de 1440p her planda
+  açıktır. Cloud Gaming'de 1440p, Game Pass Ultimate gerektirir.
+- Pencere başlığında anlık çözünürlük, fps, bant genişliği ve ağ gecikmesi görünür.
+
+Çeviri hafızası: Oyunda bir kez çevrilen cümle saklanır ve bir dahaki sefere
+internete gitmeden anında gelir. Hazır GTA 6 çeviri havuzu da içindedir.
+
+
+GİZLİLİK
+--------
+Ekran okuma tamamen bu Mac'te yapılır. İnternete yalnızca okunan cümlenin metni
+çeviri için gider; görüntü hiçbir yere gönderilmez. Ayarlar ve çeviri hafızası
+şu klasördedir:
+  ~/Library/Application Support/SetdenizPlay
+
+
+SORUNLAR
+--------
+- Çeviri çıkmıyor: çevirinin açık olduğundan emin ol (simge yeşil). ⌥R ile
+  yalnızca altyazının olduğu alanı seç; oyunun altyazı boyutunu büyütmek okumayı
+  çok iyileştirir.
+- Görüntü 1440p değil: xbox.com › Ayarlar'dan çözünürlüğü kontrol et.
+
+Kaynak kodu ve diğer sürümler: https://github.com/setnode/oyun-altyazi-cevirici

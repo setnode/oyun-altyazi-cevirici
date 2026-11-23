@@ -1,0 +1,66 @@
+ALTYAZI ÇEVİRİCİ — MAC
+======================
+
+PS Remote Play, GeForce NOW, Xbox Cloud Gaming ve ekranda oyun gösteren her
+pencerede İngilizce altyazıyı okuyup canlı olarak Türkçeye çevirir.
+Chrome eklentisinin çeviri motorunun aynısı içindedir: aynı OCR, aynı oyun sözlüğü,
+aynı hazır GTA 6 çeviri havuzu, telefon/ipucu/harita kartı çevirisi ve DeepL desteği.
+
+Gereken: macOS 13 (Ventura) veya üstü. Apple Silicon (M1–M4) ve Intel Mac.
+
+
+KURULUM
+-------
+1. "Altyazı Çevirici.app" dosyasını Uygulamalar (Applications) klasörüne sürükle.
+2. İlk açılışta macOS "geliştirici doğrulanamadı" diyebilir (uygulama ücretsiz ve
+   Apple'a ücretli kayıtlı değil). Şöyle aç:
+     Sistem Ayarları › Gizlilik ve Güvenlik › aşağıda "Altyazı Çevirici engellendi"
+     yazısının yanındaki "Yine de Aç" düğmesine bas.
+   Ya da Terminal'de bir kez şunu çalıştır:
+     xattr -dr com.apple.quarantine "/Applications/Altyazı Çevirici.app"
+3. Ekran kaydı izni ver:
+     Sistem Ayarları › Gizlilik ve Güvenlik › Ekran ve Sistem Sesi Kaydı
+     › "Altyazı Çevirici"yi aç. macOS isterse uygulamayı yeniden başlat.
+   İzin yalnızca bir kez istenir; yeni sürümlerde de geçerli kalır.
+
+
+KULLANIM
+--------
+1. Oyunu aç (PS Remote Play, GeForce NOW, tarayıcıda xbox.com/play …).
+2. Altyazı Çevirici'yi aç. "Oyun penceresi" listesinden oyunun penceresini seç.
+   PS Remote Play ve GeForce NOW açıksa kendiliğinden seçilir.
+3. ⌥T (Option + T) ile çeviriyi aç.
+4. Gerekirse ⌥R ile yalnızca İngilizce altyazının çıktığı alanı çiz (Esc: iptal).
+
+Türkçe altyazı oyunun üstündeki saydam katmanda çıkar. Katman fareyi engellemez,
+pencere taşınınca peşinden gelir, tam ekranda da çalışır. Başka uygulamaya
+geçince gizlenir.
+
+Kısayollar (oyun öndeyken de çalışır):
+  ⌥T   Çeviriyi aç / kapat
+  ⌥R   Altyazı bölgesini seç
+Menü çubuğundaki altyazı simgesinden de aynı komutlara ve ayarlara ulaşılır.
+
+Ayarlar penceresi Chrome eklentisindekinin aynısıdır: dil, konum (üstte / altta /
+yerine), görünüm, yazı boyu, telefon/ipucu/harita çevirisi, DeepL anahtarı ve
+"GTA 6 kaydını indir" (İndirilenler klasörüne kaydeder).
+
+
+GİZLİLİK
+--------
+Ekran okuma tamamen bu Mac'te yapılır. İnternete yalnızca okunan cümlenin metni
+çeviri için gider; ekran görüntüsü hiçbir yere gönderilmez. Ayarlar ve çeviri
+önbelleği şu klasördedir:
+  ~/Library/Application Support/AltyaziCevirici
+
+
+SORUNLAR
+--------
+- "Oyun penceresi" listesi boş: ekran kaydı izni verilmemiş ya da uygulama izinden
+  sonra yeniden başlatılmamış.
+- Çeviri çıkmıyor: ⌥R ile yalnızca altyazının olduğu alanı seç; oyunun altyazı
+  boyutunu büyütmek okumayı çok iyileştirir.
+- Katman yanlış yerde: pencereyi biraz oynat ya da listeden yeniden seç; oyun
+  görüntüsünün yeri hareketli bölgeden birkaç saniyede bulunur.
+
+Kaynak kodu ve diğer sürümler: https://github.com/setnode/oyun-altyazi-cevirici

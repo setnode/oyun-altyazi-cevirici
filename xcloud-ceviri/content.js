@@ -3118,14 +3118,19 @@
     // Okuma kalitesi (kelime güveni ortalaması): net kare ~90, hareket bulanıklığı 50–75
     return { title, bubbles: bs, q: bs.reduce((a, x) => a + x.q * x.nw, 0) / nw };
   }
+  // Panelin dayandığı konum: telefon elde hafifçe salınırken panel yerinde durur (titremesin), yalnızca telefon
+  // belirgin biçimde başka yere geçince (enin %5'i / boyun %6'sı) yeni yerine taşınır
+  let phoneAnchor = null;
   function phoneHide() {
-    phoneShown = null;
+    phoneShown = null; phoneAnchor = null;
     ui.phone.classList.remove('show');
   }
   function phoneLayout(v, c) {
     if (!phoneShown || !phoneBox || !v || !v.videoWidth) return;
     c = c || contentRect(v);
-    const kx = c.width / v.videoWidth, ky = c.height / v.videoHeight, b = phoneBox;
+    const pb = phoneBox, a = phoneAnchor;
+    if (!a || Math.abs(pb.x0 - a.x0) > v.videoWidth * 0.05 || Math.abs(pb.y0 - a.y0) > v.videoHeight * 0.06) phoneAnchor = { x0: pb.x0, y0: pb.y0 };
+    const kx = c.width / v.videoWidth, ky = c.height / v.videoHeight, b = phoneAnchor;
     const fontPx = Math.round(Math.min(30, Math.max(13, ((S.fontSize * c.height) / 720) * 0.6)));
     ui.phone.style.fontSize = fontPx + 'px';
     const phoneLeft = c.left + b.x0 * kx - c.width * 0.035; // telefon gövdesi + boşluk
