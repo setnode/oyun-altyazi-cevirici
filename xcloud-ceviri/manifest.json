@@ -1,0 +1,67 @@
+{
+  "manifest_version": 3,
+  "name": "xCloud Altyazı Çevirici",
+  "version": "1.14.4",
+  "description": "Xbox Cloud Gaming (xbox.com/play) ekranındaki altyazıları okuyup canlı olarak Türkçeye çevirir.",
+  "permissions": [
+    "offscreen",
+    "storage",
+    "unlimitedStorage"
+  ],
+  "host_permissions": [
+    "https://*.xbox.com/*",
+    "https://translate.googleapis.com/*",
+    "https://clients5.google.com/*",
+    "https://api-free.deepl.com/*",
+    "https://api.deepl.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.xbox.com/*",
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "sozluk.js",
+        "havuz.js",
+        "content.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "xCloud Altyazı Çevirici",
+    "default_icon": {
+      "16": "icons/16.png",
+      "48": "icons/48.png",
+      "128": "icons/128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/16.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "commands": {
+    "toggle": {
+      "suggested_key": {
+        "default": "Alt+T"
+      },
+      "description": "Çeviriyi aç / kapat"
+    },
+    "select-region": {
+      "suggested_key": {
+        "default": "Alt+R"
+      },
+      "description": "Altyazı bölgesini seç"
+    }
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}

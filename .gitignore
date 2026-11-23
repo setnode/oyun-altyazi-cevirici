@@ -1,0 +1,6 @@
+bin/
+obj/
+cikti/
+.DS_Store
+*.zip
+*.exe

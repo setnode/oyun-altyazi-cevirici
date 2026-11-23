@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>xCloud Altyazı Çevirici</title>
+<style>
+  :root { color-scheme: light dark; --bg: #f6f6f6; --fg: #151515; --muted: #666; --card: #fff; --line: #dcdcdc; --accent: #107c10; --warn: #9a6700; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #1b1b1b; --fg: #f1f1f1; --muted: #a0a0a0; --card: #262626; --line: #3a3a3a; --warn: #e3b341; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; width: 330px; background: var(--bg); color: var(--fg); font: 13px/1.4 -apple-system, "Segoe UI", system-ui, sans-serif; }
+  header { padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--line); }
+  h1 { font-size: 14px; margin: 0; }
+  h1 small { display: block; font-size: 11px; font-weight: 400; color: var(--muted); }
+  main { padding: 12px 14px 14px; display: grid; gap: 10px; }
+  fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 8px; }
+  legend { padding: 0; margin-bottom: 2px; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+  label { display: grid; gap: 4px; color: var(--muted); font-size: 12px; }
+  select { width: 100%; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--fg); font: inherit; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .range { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
+  .range input { accent-color: var(--accent); }
+  #deeplKey { width: 100%; box-sizing: border-box; padding: 6px 8px; font: inherit; }
+  #deeplSave { margin-top: 6px; }
+  .range output { font-variant-numeric: tabular-nums; color: var(--fg); min-width: 44px; text-align: right; }
+  button { padding: 8px 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--fg); font: inherit; font-weight: 600; cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button:disabled { opacity: .5; cursor: default; }
+  .switch { display: flex; align-items: center; gap: 8px; color: var(--fg); font-weight: 600; font-size: 13px; }
+  .switch input { width: 18px; height: 18px; accent-color: var(--accent); margin: 0; }
+  .buttons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  #tabNote { margin: 0; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--warn); color: var(--warn); font-size: 12px; }
+  #tabNote[hidden] { display: none; }
+  details { border-top: 1px solid var(--line); padding-top: 8px; }
+  summary { cursor: pointer; font-size: 12px; color: var(--muted); }
+  details[open] summary { margin-bottom: 8px; }
+  p.note { margin: 0; color: var(--muted); font-size: 11px; }
+  kbd { font: 11px ui-monospace, monospace; border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>xCloud Altyazı Çevirici <small id="version"></small></h1>
+  <label class="switch"><input type="checkbox" id="enabled"> Açık</label>
+</header>
+<main>
+  <p id="tabNote" hidden>Bu sekme Xbox Cloud veya YouTube değil. Ayarlar kaydedilir; bölge seçimi ve önizleme oyun sekmesinde çalışır.</p>
+
+  <fieldset>
+    <legend>Dil</legend>
+    <div class="row">
+      <label>Oyunun dili
+        <select id="from">
+          <option value="en">İngilizce</option><option value="de">Almanca</option><option value="fr">Fransızca</option>
+          <option value="es">İspanyolca</option><option value="it">İtalyanca</option><option value="pt">Portekizce</option>
+        </select>
+      </label>
+      <label>Çeviri dili
+        <select id="to">
+          <option value="tr">Türkçe</option><option value="en">İngilizce</option><option value="de">Almanca</option>
+        </select>
+      </label>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Altyazı</legend>
+    <div class="row">
+      <label>Konum
+        <select id="overlay">
+          <option value="above">İngilizcenin üstünde (önerilen)</option>
+          <option value="below">İngilizcenin altında</option>
+          <option value="replace">Koyu kutuyla örtülü</option>
+          <option value="game">İngilizceyi sil, yerine yaz (deneysel)</option>
+        </select>
+      </label>
+      <label>Görünüm
+        <select id="style">
+          <option value="cinema">Sinema (çerçeveli)</option>
+          <option value="box">Yarı saydam şerit</option>
+        </select>
+      </label>
+    </div>
+    <label>Yazı boyutu
+      <span class="range"><input type="range" id="fontSize" min="18" max="48" step="1"><output id="fontSizeOut"></output></span>
+    </label>
+    <label>Dikey konum (artı = daha yukarı)
+      <span class="range"><input type="range" id="offsetY" min="-20" max="80" step="2"><output id="offsetYOut"></output></span>
+    </label>
+    <label class="switch"><input type="checkbox" id="msgOn"> Telefonu da çevir (sağ alt mesaj kutusu + eldeki telefon ekranı)</label>
+    <label class="switch"><input type="checkbox" id="hintOn"> İpucu kutularını da çevir (sol üstteki bilgi kutusu)</label>
+    <label class="switch"><input type="checkbox" id="cardOn"> Harita/menü bilgi kartlarını da çevir</label>
+  </fieldset>
+
+  <div class="buttons">
+    <button class="primary" id="selectRegion" title="Alt+R">Bölge seç</button>
+    <button id="preview">Önizle</button>
+    <button id="resetRegion">Sıfırla</button>
+  </div>
+
+  <details>
+    <summary>Gelişmiş</summary>
+    <fieldset>
+      <label>Çeviri motoru
+        <select id="engine">
+          <option value="auto">Otomatik (Google, olmazsa Chrome)</option>
+          <option value="builtin">Sadece Chrome (cihaz üzerinde)</option>
+          <option value="google">Sadece Google Çeviri</option>
+        </select>
+      </label>
+      <label>Oyun altyazı rengi
+        <select id="textMode">
+          <option value="bright">Beyaz / açık renk</option>
+          <option value="auto">Diğer renkler</option>
+        </select>
+      </label>
+      <label>Parlaklık eşiği (yanlış okursa değiştir)
+        <span class="range"><input type="range" id="threshold" min="100" max="240" step="5"><output id="thresholdOut"></output></span>
+      </label>
+      <label>Tarama aralığı
+        <span class="range"><input type="range" id="interval" min="100" max="1000" step="50"><output id="intervalOut"></output></span>
+      </label>
+    </fieldset>
+  </details>
+
+  <details id="deeplBox">
+    <summary>DeepL (isteğe bağlı)</summary>
+    <fieldset>
+      <label for="deeplKey">DeepL API anahtarı</label>
+      <input id="deeplKey" type="password" autocomplete="off" spellcheck="false" placeholder="xxxxxxxx-xxxx-…:fx">
+      <button id="deeplSave" type="button">Kaydet ve dene</button>
+      <p class="note" id="deeplStatus">Gecikme eklemez: ekranda Google'ın çevirisi anında çıkar, DeepL arkadan sorulup kaydedilir; aynı cümle sonraki sefer DeepL kalitesinde gelir.</p>
+    </fieldset>
+  </details>
+
+  <button id="exportKayit" type="button">GTA 6 kaydını indir</button>
+
+  <p class="note">Kısayollar: <kbd>Alt</kbd>+<kbd>T</kbd> aç/kapat · <kbd>Alt</kbd>+<kbd>R</kbd> bölge seç. Bölgeyi sadece İngilizce altyazının çıktığı alana çiz.</p>
+</main>
+<script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+    <UseWindowsForms>true</UseWindowsForms>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>XCloudCevirici</AssemblyName>
+    <RootNamespace>XCloudCevirici</RootNamespace>
+    <Product>xCloud Altyazı Çevirici</Product>
+    <Version>1.11.23</Version>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+
+    <!-- Tek dosya, .NET kurulumu gerektirmeyen exe -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <DebugType>none</DebugType>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="app.ico" />
+    <!-- Chrome eklentisiyle ortak oyun sözlüğü -->
+    <EmbeddedResource Include="../xcloud-ceviri/sozluk.js" LogicalName="sozluk.js" />
+    <EmbeddedResource Include="../xcloud-ceviri/kelimeler.txt" LogicalName="kelimeler.txt" />
+    <!-- Hazır GTA 6 çeviri havuzu (havuz/olustur.js üretir) -->
+    <EmbeddedResource Include="../xcloud-ceviri/gta6-havuz.json" LogicalName="gta6-havuz.json" Condition="Exists('../xcloud-ceviri/gta6-havuz.json')" />
+  </ItemGroup>
+
+</Project>
