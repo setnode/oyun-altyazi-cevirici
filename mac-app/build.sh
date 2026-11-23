@@ -5,7 +5,7 @@
 # ./build.sh zip → ikisinin de zip paketi
 set -e
 cd "$(dirname "$0")"
-VERSION="1.0.0"
+VERSION="1.0.1"
 EXT="../xcloud-ceviri"
 rm -rf build; mkdir -p build
 

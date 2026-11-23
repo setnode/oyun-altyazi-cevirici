@@ -147,6 +147,8 @@ Kısayollar oyun tam ekrandayken de çalışır.
 
 Kısayollar oyun öndeyken ve tam ekranda da çalışır. setdeniz play'de aynı işler üst çubuktaki düğmelerden, ayarlar sağda açılan panelden yapılır. Ayrıntılar zip'in içindeki `BENIOKU.txt` dosyasında.
 
+**setdeniz play'de ekran siyah kalıyorsa:** Pencere başlığında bağlantının hangi aşamada kaldığı yazar. Görüntü gelmezse uygulama kendiliğinden "uyumlu mod"a geçer (kalite ayarları kapanır, sayfa yenilenir); oyunu yeniden başlat. Sorun sürerse **Yardım → Tanı raporunu Masaüstüne kaydet** ile oluşan `setdeniz-play-tani.txt` dosyasını sorun bildirimine ekle.
+
 ---
 
 ## Chrome eklentisi (Xbox Cloud Gaming)

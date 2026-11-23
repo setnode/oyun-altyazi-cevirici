@@ -57,5 +57,12 @@ SORUNLAR
   yalnızca altyazının olduğu alanı seç; oyunun altyazı boyutunu büyütmek okumayı
   çok iyileştirir.
 - Görüntü 1440p değil: xbox.com › Ayarlar'dan çözünürlüğü kontrol et.
+- Ekran siyah kalıyor: pencere başlığında bağlantının hangi aşamada kaldığı yazar.
+  Görüntü 12 saniyede gelmezse uygulama kendiliğinden "uyumlu mod"a geçer (kalite
+  ayarları kapanır) ve sayfayı yeniler; oyunu yeniden başlat. Uyumlu mod Yardım
+  menüsünden elle de açılıp kapatılır.
+- Sorun sürerse: Yardım › Tanı raporunu Masaüstüne kaydet. Oluşan
+  setdeniz-play-tani.txt dosyasını sorun bildirimine ekle (hesap ve konsol
+  kimliği içermez).
 
 Kaynak kodu ve diğer sürümler: https://github.com/setnode/oyun-altyazi-cevirici

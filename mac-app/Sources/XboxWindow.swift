@@ -170,6 +170,27 @@ final class XboxWindow: NSObject, NSWindowDelegate, WKNavigationDelegate, WKUIDe
         return item
     }
 
+    /// Uyumlu modu aç/kapat: xbox.com'un kendi deposunda tutulur, sayfa yenilenince geçerli olur
+    func setUyumlu(_ on: Bool) {
+        let js = on ? "localStorage.setItem('xctUyumlu','1')" : "localStorage.removeItem('xctUyumlu')"
+        web.evaluateJavaScript(js, in: nil, in: .page) { [weak self] _ in self?.web.reload() }
+    }
+
+    /// Tanı raporu: sürüm, sistem, bağlantı olayları ve son ölçümler (hesap/oturum bilgisi içermez)
+    func taniRaporu() -> String {
+        let p = ProcessInfo.processInfo
+        var model = [CChar](repeating: 0, count: 64); var n = 64
+        sysctlbyname("hw.model", &model, &n, nil, 0)
+        var r = "\(appName) \(appVersion) tanı raporu\n"
+        r += "macOS \(p.operatingSystemVersionString) · \(String(cString: model)) · \(p.processorCount) çekirdek\n"
+        r += "Uyumlu mod: \(PageStats.shared.uyumlu ? "açık" : "kapalı")\n"
+        r += "Ekran: " + NSScreen.screens.map { "\(Int($0.frame.width))×\(Int($0.frame.height))@\(Int($0.backingScaleFactor))x" }.joined(separator: ", ") + "\n"
+        r += "Sayfa: " + (web.url.map { ($0.host ?? "") + $0.path } ?? "-") + "\n\n"
+        r += "--- Olaylar ---\n" + PageStats.shared.olaylar.joined(separator: "\n") + "\n\n"
+        r += "--- Son ölçümler ---\n" + PageStats.shared.olcumler.joined(separator: "\n") + "\n"
+        return r
+    }
+
     @objc func goBack() { if web.canGoBack { web.goBack() } }
     @objc func reload() { web.reload() }
     @objc func goHome() { web.load(URLRequest(url: XboxWindow.home)) }
@@ -240,9 +261,21 @@ final class XboxWindow: NSObject, NSWindowDelegate, WKNavigationDelegate, WKUIDe
 final class PageStats: NSObject, WKScriptMessageHandler {
     static let shared = PageStats()
     var onStats: ((String) -> Void)?
+    var uyumlu = false
+    // Tanı raporu için son olaylar (hata ayıklama modu kapalıyken de tutulur; yalnızca istenince dosyaya yazılır)
+    private(set) var olaylar: [String] = []
+    private(set) var olcumler: [String] = []
+    private let saat: DateFormatter = { let f = DateFormatter(); f.dateFormat = "HH:mm:ss"; return f }()
+    private func ekle(_ t: String, olcum: Bool = false) {
+        let satir = saat.string(from: Date()) + " " + t
+        if olcum { olcumler.append(satir); if olcumler.count > 30 { olcumler.removeFirst() } }
+        else { olaylar.append(satir); if olaylar.count > 300 { olaylar.removeFirst() } }
+    }
     func userContentController(_ ucc: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let b = message.body as? [String: Any], let op = b["op"] as? String else { return }
-        if op == "log", let t = b["text"] as? String { Debug.log("[yayın] " + t); return }
+        if op == "log", let t = b["text"] as? String { ekle(t); Debug.log("[yayın] " + t); return }
+        if op == "durum", let t = b["text"] as? String { ekle("durum: " + t); onStats?(t); return }
+        if op == "uyumlu" { uyumlu = (b["on"] as? Bool) ?? false; return }
         guard op == "stats" else { return }
         func n(_ k: String) -> Int { (b[k] as? NSNumber)?.intValue ?? 0 }
         let mbps = (b["mbps"] as? NSNumber)?.doubleValue ?? 0
@@ -253,6 +286,7 @@ final class PageStats: NSObject, WKScriptMessageHandler {
         if let c = b["codec"] as? String, !c.isEmpty { parts.append(c) }
         let text = parts.joined(separator: " · ")
         onStats?(text)
+        ekle(text + " kayıp=\(n("lost")) atlanan=\(n("dropped"))", olcum: true)
         Debug.log("[ölçüm] " + text + " kayıp=\(n("lost")) atlanan=\(n("dropped")) çözme=\(b["dec"] ?? 0) ms")
     }
 }

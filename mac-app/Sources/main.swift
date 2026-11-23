@@ -348,6 +348,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, WKNavi
         settingsWindow.orderOut(nil)
         overlay.beginSelect()
     }
+    var uyumluItem: NSMenuItem!
+    func menuNeedsUpdate(_ menu: NSMenu) { uyumluItem?.state = PageStats.shared.uyumlu ? .on : .off }
+    @objc func toggleUyumlu() { xbox?.setUyumlu(!PageStats.shared.uyumlu) }
+    @objc func saveTani() {
+        guard let x = xbox else { return }
+        let desk = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask)[0]
+        let url = desk.appendingPathComponent("setdeniz-play-tani.txt")
+        do {
+            try x.taniRaporu().write(to: url, atomically: true, encoding: .utf8)
+            NSWorkspace.shared.activateFileViewerSelecting([url])
+        } catch {
+            let a = NSAlert(); a.messageText = "Tanı raporu kaydedilemedi"; a.informativeText = error.localizedDescription; a.runModal()
+        }
+    }
     @objc func previewSub() { Bridge.shared.sendToContent(["type": "preview"]) }
 
     func buildMenu() {
@@ -374,6 +388,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, WKNavi
         wm.addItem(NSMenuItem(title: "Kapat", action: #selector(NSWindow.performClose(_:)), keyEquivalent: "w"))
         wm.addItem(NSMenuItem(title: "Küçült", action: #selector(NSWindow.performMiniaturize(_:)), keyEquivalent: "m"))
         winItem.submenu = wm
+        if isPlay {
+            let helpItem = NSMenuItem(); main.addItem(helpItem)
+            let hm = NSMenu(title: "Yardım")
+            hm.delegate = self
+            uyumluItem = NSMenuItem(title: "Uyumlu mod (görüntü gelmiyorsa)", action: #selector(toggleUyumlu), keyEquivalent: "")
+            hm.addItem(uyumluItem)
+            hm.addItem(NSMenuItem(title: "Tanı raporunu Masaüstüne kaydet", action: #selector(saveTani), keyEquivalent: ""))
+            helpItem.submenu = hm
+        }
         NSApp.mainMenu = main
     }
 

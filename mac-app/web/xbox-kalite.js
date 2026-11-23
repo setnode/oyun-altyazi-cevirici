@@ -10,7 +10,15 @@
   const handler = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.xctPage;
   const post = (m) => { try { handler && handler.postMessage(m); } catch (e) {} };
   const Q = window.__xctHedef || { w: 2560, h: 1440 };
-  const log = (t, d) => post({ op: 'log', text: t + ' ' + (d === undefined ? '' : typeof d === 'string' ? d : JSON.stringify(d)).slice(0, 1800) });
+  // Kayıtta konsol/oturum kimlikleri gizlenir (tanı raporu başkasına gönderilebilir)
+  const gizle = (t) => t.replace(/("(?:serverId|sessionId|consoleId|deviceId|clientSessionId|id)\\?"\s*:\s*\\?")[^"\\]+/gi, '$1***');
+  const log = (t, d) => post({ op: 'log', text: gizle(t + ' ' + (d === undefined ? '' : typeof d === 'string' ? d : JSON.stringify(d))).slice(0, 1800) });
+  const durum = (t) => post({ op: 'durum', text: t });
+  // Uyumlu mod: kalite ayarları (cihaz bildirimi, kodek sırası, kısa tampon) kapalı, yayın Safari'nin
+  // kendi ayarlarıyla açılır. Görüntü gelmezse kendiliğinden açılır; menüden de açılıp kapatılır.
+  const UYUMLU = (() => { try { return localStorage.getItem('xctUyumlu') === '1'; } catch (e) { return false; } })();
+  post({ op: 'uyumlu', on: UYUMLU });
+  if (UYUMLU) log('uyumlu mod açık: kalite ayarları uygulanmıyor');
 
   // ---------- 1) Oturum isteği: cihaz bilgisi ----------
   const PLAY = /\/v\d+\/sessions\/(cloud|home)\/play\b/i;
@@ -32,8 +40,20 @@
       return JSON.stringify(b);
     } catch (e) { return body; }
   }
+  // Oturum isteğinin sonucu: kalite ayarlarıyla reddedilirse uyumlu moda geçilir
+  function oturumSonucu(status, metin) {
+    log('oturum yanıtı ' + status);
+    if (status >= 200 && status < 300) return;
+    Promise.resolve().then(metin).then((t) => log('oturum hatası', String(t).slice(0, 600))).catch(() => {});
+    // 409 (başka yerde açık oturum) ve 429 (yoğunluk) kalite ayarından değil
+    if (!UYUMLU && status !== 409 && status !== 429 && status >= 400) {
+      try { localStorage.setItem('xctUyumlu', '1'); } catch (e) {}
+      durum('Oturum açılamadı: uyumlu moda geçiliyor, sayfa yenileniyor. Oyunu yeniden başlat.');
+      setTimeout(() => location.reload(), 3000);
+    }
+  }
   const realFetch = window.fetch;
-  window.fetch = function (input, init) {
+  if (!UYUMLU) window.fetch = function (input, init) {
     try {
       const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input && input.url;
       if (url && PLAY.test(url)) {
@@ -48,7 +68,9 @@
           const opts = { ...(isReq ? { method: input.method, credentials: input.credentials, mode: input.mode, cache: input.cache, redirect: input.redirect, referrer: input.referrer } : {}), ...(init || {}), headers: h };
           if (body !== undefined) opts.body = body;
           log('oturum (fetch)', { url: url.replace(/\?.*/, ''), cihaz: h.get('X-MS-Device-Info') ? JSON.parse(h.get('X-MS-Device-Info')).dev : null, govde: typeof body === 'string' ? body.slice(0, 500) : null });
-          return realFetch.call(window, url, opts);
+          const resp = await realFetch.call(window, url, opts);
+          oturumSonucu(resp.status, () => resp.clone().text());
+          return resp;
         })();
       }
     } catch (e) { log('fetch hata', String(e)); }
@@ -56,17 +78,18 @@
   };
   // Aynısı XHR ile giderse
   const xo = XMLHttpRequest.prototype.open, xh = XMLHttpRequest.prototype.setRequestHeader, xs = XMLHttpRequest.prototype.send;
-  XMLHttpRequest.prototype.open = function (m, u) { this.__xctPlay = PLAY.test(String(u)); this.__xctUrl = String(u); return xo.apply(this, arguments); };
-  XMLHttpRequest.prototype.setRequestHeader = function (k, v) {
+  if (!UYUMLU) XMLHttpRequest.prototype.open = function (m, u) { this.__xctPlay = PLAY.test(String(u)); this.__xctUrl = String(u); return xo.apply(this, arguments); };
+  if (!UYUMLU) XMLHttpRequest.prototype.setRequestHeader = function (k, v) {
     if (this.__xctPlay && /^x-ms-device-info$/i.test(k)) v = cihaz(v);
     return xh.call(this, k, v);
   };
-  XMLHttpRequest.prototype.send = function (body) {
+  if (!UYUMLU) XMLHttpRequest.prototype.send = function (body) {
     if (this.__xctPlay && typeof body === 'string') { body = govde(body); log('oturum (xhr)', { url: this.__xctUrl.replace(/\?.*/, ''), govde: body.slice(0, 500) }); }
+    if (this.__xctPlay) this.addEventListener('loadend', () => oturumSonucu(this.status, () => String(this.responseText || '')));
     return xs.call(this, body);
   };
   // Sayfa cihazın ekranını da sorabilir: 1440p ekran gibi görünsün
-  try {
+  if (!UYUMLU) try {
     for (const [k, v] of [['width', Q.w], ['height', Q.h], ['availWidth', Q.w], ['availHeight', Q.h]]) {
       Object.defineProperty(Screen.prototype, k, { get: () => v, configurable: true });
     }
@@ -120,7 +143,7 @@
   }
   const origSLD = RTCPeerConnection.prototype.setLocalDescription;
   RTCPeerConnection.prototype.setLocalDescription = function (desc) {
-    if (desc && desc.sdp && desc.type === 'offer') desc = { type: desc.type, sdp: h264Once(desc.sdp) };
+    if (!UYUMLU && desc && desc.sdp && desc.type === 'offer') desc = { type: desc.type, sdp: h264Once(desc.sdp) };
     return origSLD.apply(this, desc ? [desc] : arguments);
   };
 
@@ -131,15 +154,63 @@
     const pc = new OrigPC(...args);
     pcs.add(pc);
     pc.addEventListener('track', (e) => {
+      if (UYUMLU) return;
       try { if ('jitterBufferTarget' in e.receiver) e.receiver.jitterBufferTarget = 0; } catch (x) {}
       try { if ('playoutDelayHint' in e.receiver) e.receiver.playoutDelayHint = 0; } catch (x) {}
     });
-    pc.addEventListener('connectionstatechange', () => { if (pc.connectionState === 'closed') pcs.delete(pc); });
+    pc.addEventListener('iceconnectionstatechange', () => log('ice ' + pc.iceConnectionState));
+    pc.addEventListener('connectionstatechange', () => {
+      const st = pc.connectionState;
+      log('bağlantı ' + st);
+      if (st === 'connecting') durum('Bağlanıyor…');
+      else if (st === 'connected') { durum('Bağlandı, görüntü bekleniyor…'); bekci(pc); }
+      else if (st === 'failed') durum('Bağlantı kurulamadı: ağ (NAT/güvenlik duvarı) yayını engelliyor olabilir');
+      else if (st === 'disconnected') durum('Bağlantı koptu');
+      if (st === 'closed') pcs.delete(pc);
+    });
     return pc;
   }
   PC.prototype = OrigPC.prototype;
   Object.setPrototypeOf(PC, OrigPC);
   window.RTCPeerConnection = PC;
+
+  // Görüntü bekçisi: bağlandıktan sonra hiç kare çözülmezse (siyah ekran) ayrıntılar kaydedilir; kalite
+  // modundaysa uyumlu moda geçilip sayfa yenilenir (oyun yeniden başlatılınca Safari'nin kendi ayarlarıyla açılır)
+  async function videoDurumu(pc) {
+    const st = await pc.getStats();
+    let v = null, pair = null; const loc = {}, rem = {}, codecs = {};
+    st.forEach((r) => {
+      if (r.type === 'inbound-rtp' && r.kind === 'video') v = r;
+      if (r.type === 'candidate-pair' && r.nominated && r.state === 'succeeded') pair = r;
+      if (r.type === 'local-candidate') loc[r.id] = r;
+      if (r.type === 'remote-candidate') rem[r.id] = r;
+      if (r.type === 'codec') codecs[r.id] = r;
+    });
+    const c = v && codecs[v.codecId];
+    return {
+      video: !!v, alinan: v ? v.framesReceived || 0 : 0, cozulen: v ? v.framesDecoded || 0 : 0, bayt: v ? v.bytesReceived || 0 : 0,
+      boyut: v ? (v.frameWidth || 0) + 'x' + (v.frameHeight || 0) : '', kodek: c ? c.mimeType + ' ' + (c.sdpFmtpLine || '') : '',
+      cozucu: v && v.decoderImplementation, paket: v ? v.packetsReceived || 0 : 0, kayip: v ? v.packetsLost || 0 : 0,
+      yol: pair ? ((loc[pair.localCandidateId] || {}).candidateType + '→' + (rem[pair.remoteCandidateId] || {}).candidateType + ' ' + ((loc[pair.localCandidateId] || {}).protocol || '')) : '',
+    };
+  }
+  function bekci(pc) {
+    setTimeout(async () => { try { log('tanı 4 sn', await videoDurumu(pc)); } catch (e) {} }, 4000);
+    setTimeout(async () => {
+      if (pc.connectionState !== 'connected') return;
+      let d; try { d = await videoDurumu(pc); } catch (e) { return; }
+      log('tanı 12 sn', d);
+      if (d.cozulen > 0) return;
+      if (!UYUMLU) {
+        try { localStorage.setItem('xctUyumlu', '1'); } catch (e) {}
+        durum('Görüntü gelmedi: uyumlu moda geçiliyor, sayfa yenileniyor. Oyunu yeniden başlat.');
+        log('uyumlu moda geçildi');
+        setTimeout(() => location.reload(), 3000);
+      } else {
+        durum(d.bayt ? 'Görüntü verisi geliyor ama çözülemiyor (Yardım › Tanı raporu)' : 'Görüntü verisi hiç gelmiyor: ağ engelliyor olabilir (Yardım › Tanı raporu)');
+      }
+    }, 12000);
+  }
 
   let last = null;
   setInterval(async () => {
