@@ -1585,6 +1585,12 @@
         return AD_TUT[i];
       });
     }
+    // Sosyal medya adları ve etiketler çevrilmez ("@Swampinator" → "@Bataklıkçı" olmasın)
+    t = t.replace(/(?<![\p{L}\p{N}])[@#][\p{L}\p{N}_.]*\p{L}[\p{L}\p{N}_]*/gu, (m) => {
+      let i = map.indexOf(m);
+      if (i < 0) { if (map.length >= AD_TUT.length) return m; i = map.length; map.push(m); }
+      return AD_TUT[i];
+    });
     return { t, map };
   }
   // Uydurma ad ünsüzle bitiyor ("Zorvax'a"); asıl ad ünlüyle bitiyorsa kaynaştırma harfi gerekir ("City'ye", "Leonida'nın")
@@ -1608,7 +1614,8 @@
     const { t, map } = adKoru(text);
     if (!map.length) return translateCore(text, onLate);
     // Koruma yokken önceden çevrilmiş cümle Google'a yeniden sorulmaz
-    if (cache.has('en>tr:' + normalizeSlang(prepForMT(text))) || (havuzHazir && HAVUZ.lookup(text))) return translateCore(text, onLate);
+    // (@ad içeren eski kayıtlarda ad çevrilmiş olabilir: onlarda önbellek kısayolu yok)
+    if (!/[@#]\p{L}/u.test(text) && (cache.has('en>tr:' + normalizeSlang(prepForMT(text))) || (havuzHazir && HAVUZ.lookup(text)))) return translateCore(text, onLate);
     const back = adGeri(await translateCore(t, onLate), map);
     if (back == null) return translateCore(text, onLate);
     gta6Kaydet(text, back);

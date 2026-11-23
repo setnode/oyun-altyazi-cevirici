@@ -1460,8 +1460,16 @@ sealed class Engine
                 return AdTut[i];
             });
         }
+        // Sosyal medya adları ve etiketler çevrilmez ("@Swampinator" → "@Bataklıkçı" olmasın)
+        text = SosyalAd.Replace(text, m =>
+        {
+            int i = map.IndexOf(m.Value);
+            if (i < 0) { if (map.Count >= AdTut.Length) return m.Value; i = map.Count; map.Add(m.Value); }
+            return AdTut[i];
+        });
         return (text, map);
     }
+    static readonly Regex SosyalAd = new(@"(?<![\p{L}\p{N}])[@#][\p{L}\p{N}_.]*\p{L}[\p{L}\p{N}_]*", RegexOptions.Compiled);
 
     // Uydurma ad ünsüzle bitiyor ("Zorvax'a"); asıl ad ünlüyle bitiyorsa kaynaştırma harfi gerekir ("City'ye")
     static string AdEki(string name, string suf)
