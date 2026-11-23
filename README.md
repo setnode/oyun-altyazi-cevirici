@@ -1,6 +1,48 @@
-# Oyun Altyazı Çevirici
+<h1 align="center">Oyun Altyazı Çevirici</h1>
 
-Oyunlardaki İngilizce altyazıları ekrandan okuyup **canlı olarak Türkçeye çeviren** ve sinema altyazısı gibi oyunun üstünde gösteren ücretsiz bir araç.
+<p align="center">
+  Oyunlardaki İngilizce altyazıları ekrandan okuyup <b>canlı olarak Türkçeye çeviren</b> ve sinema altyazısı gibi oyunun üstünde gösteren ücretsiz bir araç.
+</p>
+
+<p align="center">
+  <a href="https://github.com/setnode/oyun-altyazi-cevirici/releases/latest"><img alt="Son sürüm" src="https://img.shields.io/github/v/release/setnode/oyun-altyazi-cevirici?label=s%C3%BCr%C3%BCm&color=2ea44f"></a>
+  <img alt="Windows" src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6">
+  <img alt="Chrome" src="https://img.shields.io/badge/Chrome-eklenti-4285F4">
+  <img alt="Lisans" src="https://img.shields.io/badge/lisans-MIT-blue">
+</p>
+
+<p align="center">
+  <a href="https://github.com/setnode/oyun-altyazi-cevirici/releases/latest"><b>⬇ İndir</b></a> ·
+  <a href="#windows-uygulaması">Windows kurulumu</a> ·
+  <a href="#chrome-eklentisi-xbox-cloud-gaming">Chrome kurulumu</a> ·
+  <a href="#sık-sorulanlar">Sık sorulanlar</a>
+</p>
+
+<p align="center">
+  <img src="docs/gorseller/altyazi.jpg" alt="Ara sahnede İngilizce altyazının üstünde Türkçe çevirisi" width="900">
+</p>
+
+## Ekran görüntüleri
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="docs/gorseller/telefon.jpg" alt="Oyundaki telefon mesajlarının Türkçe çevirisi"><br>
+      <b>Telefon mesajları:</b> Elindeki telefonun ekranı okunur, mesajlar konuşma balonları halinde Türkçe gösterilir.
+    </td>
+    <td width="50%" valign="top">
+      <img src="docs/gorseller/harita-karti.jpg" alt="Harita bilgi kartının Türkçe çevirisi"><br>
+      <b>Harita ve görev kartları:</b> Mekân ve görev açıklamaları çevrilir. Oyundaki özel adlar ("Ammu-Nation") korunur.
+    </td>
+  </tr>
+</table>
+
+<p align="center">
+  <img src="docs/gorseller/ayarlar.png" alt="Chrome eklentisinin ayar paneli" width="620"><br>
+  <sub>Chrome eklentisinin ayar paneli: dil, konum, görünüm, yazı boyutu, telefon/ipucu/harita çevirisi ve isteğe bağlı DeepL</sub>
+</p>
+
+## Hangi platformlarda çalışır?
 
 Altyazı ekranda göründüğü sürece hangi platformda oynadığın fark etmez:
 
